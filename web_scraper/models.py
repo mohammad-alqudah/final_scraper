@@ -18,8 +18,8 @@ class AuthGroup(models.Model):
 
 class AuthGroupPermissions(models.Model):
     id = models.BigAutoField(primary_key=True)
-    group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
-    permission = models.ForeignKey('AuthPermission', models.DO_NOTHING)
+    group = models.ForeignKey(AuthGroup, models.CASCADE)
+    permission = models.ForeignKey('AuthPermission', models.CASCADE)
 
     class Meta:
         managed = False
@@ -29,7 +29,7 @@ class AuthGroupPermissions(models.Model):
 
 class AuthPermission(models.Model):
     name = models.CharField(max_length=255)
-    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING)
+    content_type = models.ForeignKey('DjangoContentType', models.CASCADE)
     codename = models.CharField(max_length=100)
 
     class Meta:
@@ -57,8 +57,8 @@ class AuthUser(models.Model):
 
 class AuthUserGroups(models.Model):
     id = models.BigAutoField(primary_key=True)
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
-    group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
+    user = models.ForeignKey(AuthUser, models.CASCADE)
+    group = models.ForeignKey(AuthGroup, models.CASCADE)
 
     class Meta:
         managed = False
@@ -68,8 +68,8 @@ class AuthUserGroups(models.Model):
 
 class AuthUserUserPermissions(models.Model):
     id = models.BigAutoField(primary_key=True)
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
-    permission = models.ForeignKey(AuthPermission, models.DO_NOTHING)
+    user = models.ForeignKey(AuthUser, models.CASCADE)
+    permission = models.ForeignKey(AuthPermission, models.CASCADE)
 
     class Meta:
         managed = False
@@ -83,8 +83,8 @@ class DjangoAdminLog(models.Model):
     object_repr = models.CharField(max_length=200)
     action_flag = models.SmallIntegerField()
     change_message = models.TextField()
-    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, blank=True, null=True)
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
+    content_type = models.ForeignKey('DjangoContentType', models.CASCADE, blank=True, null=True)
+    user = models.ForeignKey(AuthUser, models.CASCADE)
 
     class Meta:
         managed = False
@@ -138,8 +138,8 @@ class MainappAnnouncementCenter(models.Model):
     type = models.CharField(max_length=100, blank=True, null=True)
     link = models.CharField(max_length=200, blank=True, null=True)
     description = models.CharField(max_length=100, blank=True, null=True)
-    brand_branch = models.ForeignKey('MainappBrandBranch', models.DO_NOTHING, blank=True, null=True)
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
+    brand_branch = models.ForeignKey('MainappBrandBranch', models.CASCADE, blank=True, null=True)
+    user = models.ForeignKey(AuthUser, models.CASCADE)
 
     class Meta:
         managed = False
@@ -171,8 +171,8 @@ class MainappBrandBranch(models.Model):
     csmena_name = models.CharField(max_length=50)
     askpaper_name = models.CharField(max_length=50)
     multiplayer_forecast = models.DecimalField(max_digits=5, decimal_places=3)
-    fp_branch = models.ForeignKey('MainappFpBranch', models.DO_NOTHING, db_column='Fp_branch_id', blank=True, null=True)  # Field name made lowercase.
-    brand = models.ForeignKey(MainappBrand, models.DO_NOTHING)
+    fp_branch = models.ForeignKey('MainappFpBranch', models.CASCADE, db_column='Fp_branch_id', blank=True, null=True)  # Field name made lowercase.
+    brand = models.ForeignKey(MainappBrand, models.CASCADE)
     talabat_id = models.IntegerField(blank=True, null=True)
     talabat_name = models.CharField(max_length=100, blank=True, null=True)
     makane_name= models.CharField(max_length=100, blank=True, null=True)
@@ -207,7 +207,7 @@ class MainappFp(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=100)
     image = models.CharField(max_length=100, blank=True, null=True)
-    user = models.OneToOneField(AuthUser, models.DO_NOTHING)
+    user = models.OneToOneField(AuthUser, models.CASCADE)
 
     class Meta:
         managed = False
@@ -227,7 +227,7 @@ class MainappFpBranch(models.Model):
     sales_tax = models.DecimalField(max_digits=5, decimal_places=3)
     revenue_percentage = models.DecimalField(max_digits=5, decimal_places=3, blank=True, null=True)
     other_expenses = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
-    fp = models.ForeignKey(MainappFp, models.DO_NOTHING)
+    fp = models.ForeignKey(MainappFp, models.CASCADE)
 
     class Meta:
         managed = False
@@ -241,11 +241,11 @@ class MainappIncidentReport(models.Model):
     case_date_time = models.DateTimeField(blank=True, null=True)
     message = models.CharField(max_length=100, blank=True, null=True)
     pdf_link = models.CharField(max_length=200, blank=True, null=True)
-    brand_branch = models.ForeignKey(MainappBrandBranch, models.DO_NOTHING, blank=True, null=True)
-    channel = models.ForeignKey(MainappChannel, models.DO_NOTHING, blank=True, null=True)
-    liability = models.ForeignKey('MainappLiability', models.DO_NOTHING)
-    type_rating = models.ForeignKey('MainappTypeRating', models.DO_NOTHING)
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
+    brand_branch = models.ForeignKey(MainappBrandBranch, models.CASCADE, blank=True, null=True)
+    channel = models.ForeignKey(MainappChannel, models.CASCADE, blank=True, null=True)
+    liability = models.ForeignKey('MainappLiability', models.CASCADE)
+    type_rating = models.ForeignKey('MainappTypeRating', models.CASCADE)
+    user = models.ForeignKey(AuthUser, models.CASCADE)
 
     class Meta:
         managed = False
@@ -266,7 +266,7 @@ class MainappKitchefyUser(models.Model):
     id = models.BigAutoField(primary_key=True)
     postion = models.CharField(max_length=40)
     role = models.CharField(max_length=50)
-    user = models.OneToOneField(AuthUser, models.DO_NOTHING)
+    user = models.OneToOneField(AuthUser, models.CASCADE)
 
     class Meta:
         managed = False
@@ -288,9 +288,9 @@ class MainappKnowledgeCenter(models.Model):
     link = models.CharField(max_length=200, blank=True, null=True)
     video_link = models.CharField(max_length=200, blank=True, null=True)
     description = models.CharField(max_length=1000, blank=True, null=True)
-    fp = models.ForeignKey(MainappFp, models.DO_NOTHING)
-    knowledge_center_section = models.ForeignKey(MainappKnowleddgeCenterSection, models.DO_NOTHING)
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
+    fp = models.ForeignKey(MainappFp, models.CASCADE)
+    knowledge_center_section = models.ForeignKey(MainappKnowleddgeCenterSection, models.CASCADE)
+    user = models.ForeignKey(AuthUser, models.CASCADE)
 
     class Meta:
         managed = False
@@ -313,9 +313,9 @@ class MainappOffers(models.Model):
     end_date = models.DateField()
     status = models.BooleanField()
     soft_delete = models.BooleanField()
-    brand_branch = models.ForeignKey(MainappBrandBranch, models.DO_NOTHING, blank=True, null=True)
-    channel = models.ForeignKey(MainappChannel, models.DO_NOTHING, blank=True, null=True)
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
+    brand_branch = models.ForeignKey(MainappBrandBranch, models.CASCADE, blank=True, null=True)
+    channel = models.ForeignKey(MainappChannel, models.CASCADE, blank=True, null=True)
+    user = models.ForeignKey(AuthUser, models.CASCADE)
 
     class Meta:
         managed = False
@@ -326,7 +326,7 @@ class MainappOpeningHours(models.Model):
     id = models.BigAutoField(primary_key=True)
     start = models.TimeField()
     end = models.TimeField()
-    brand_branch = models.ForeignKey(MainappBrandBranch, models.DO_NOTHING, blank=True, null=True)
+    brand_branch = models.ForeignKey(MainappBrandBranch, models.CASCADE, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -335,8 +335,8 @@ class MainappOpeningHours(models.Model):
 
 class MainappOpeningHoursDay(models.Model):
     id = models.BigAutoField(primary_key=True)
-    opening_hours = models.ForeignKey(MainappOpeningHours, models.DO_NOTHING)
-    days = models.ForeignKey(MainappDays, models.DO_NOTHING)
+    opening_hours = models.ForeignKey(MainappOpeningHours, models.CASCADE)
+    days = models.ForeignKey(MainappDays, models.CASCADE)
 
     class Meta:
         managed = False
@@ -358,8 +358,8 @@ class MainappOrder(models.Model):
     payment_fees = models.DecimalField(max_digits=5, decimal_places=3, blank=True, null=True)
     delivary_fee = models.DecimalField(max_digits=5, decimal_places=3, blank=True, null=True)
     payment_method = models.CharField(max_length=50, blank=True, null=True)
-    brand_branch = models.ForeignKey(MainappBrandBranch, models.DO_NOTHING, blank=True, null=True)
-    channel = models.ForeignKey(MainappChannel, models.DO_NOTHING, blank=True, null=True)
+    brand_branch = models.ForeignKey(MainappBrandBranch, models.CASCADE, blank=True, null=True)
+    channel = models.ForeignKey(MainappChannel, models.CASCADE, blank=True, null=True)
     gross_basket = models.DecimalField(max_digits=5, decimal_places=3, blank=True, null=True)
     payment_handling_charges = models.DecimalField(max_digits=5, decimal_places=3, blank=True, null=True)
     pg_fees = models.DecimalField(max_digits=5, decimal_places=3, blank=True, null=True)
@@ -372,10 +372,10 @@ class MainappOrder(models.Model):
 
 class MainappOrderItem(models.Model):
     id = models.BigAutoField(primary_key=True)
-    quantity = models.IntegerField()
-    price = models.DecimalField(max_digits=5, decimal_places=3, blank=True, null=True)
-    item = models.ForeignKey(MainappItem, models.DO_NOTHING)
-    order = models.ForeignKey(MainappOrder, models.DO_NOTHING)
+    quantity = models.IntegerField(max_length=5)
+    price = models.DecimalField(max_digits=7, decimal_places=3, blank=True, null=True)
+    item = models.ForeignKey(MainappItem, models.CASCADE)
+    order = models.ForeignKey(MainappOrder, models.CASCADE)
 
     class Meta:
         managed = False
@@ -386,8 +386,8 @@ class MainappOrderItemAddOns(models.Model):
     id = models.BigAutoField(primary_key=True)
     quantity = models.IntegerField(blank=True, null=True)
     price = models.DecimalField(max_digits=5, decimal_places=3, blank=True, null=True)
-    add_ons = models.ForeignKey(MainappAddOns, models.DO_NOTHING, db_column='Add_ons_id', blank=True, null=True)  # Field name made lowercase.
-    order_item = models.ForeignKey(MainappOrderItem, models.DO_NOTHING, blank=True, null=True)
+    add_ons = models.ForeignKey(MainappAddOns, models.CASCADE, db_column='Add_ons_id', blank=True, null=True)  # Field name made lowercase.
+    order_item = models.ForeignKey(MainappOrderItem, models.CASCADE, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -398,8 +398,8 @@ class MainappStatus(models.Model):
     id = models.BigAutoField(primary_key=True)
     datetime = models.DateTimeField(blank=True, null=True)
     status = models.CharField(max_length=15, blank=True, null=True)
-    brand_branch = models.ForeignKey(MainappBrandBranch, models.DO_NOTHING, db_column='Brand_branch_id')  # Field name made lowercase.
-    channel = models.ForeignKey(MainappChannel, models.DO_NOTHING, blank=True, null=True)
+    brand_branch = models.ForeignKey(MainappBrandBranch, models.CASCADE, db_column='Brand_branch_id')  # Field name made lowercase.
+    channel = models.ForeignKey(MainappChannel, models.CASCADE, blank=True, null=True)
 
     class Meta:
         managed = False
