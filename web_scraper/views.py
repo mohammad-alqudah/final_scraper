@@ -17,12 +17,12 @@ def run():
     from .models import  MainappOrder,MainappChannel
 
 
-    start_date  = date - timedelta(days=1)
+    start_date  = date - timedelta(days=20)
     end_date = date - timedelta(days=0)
     start_timer = datetime.now()
-    # channel = MainappChannel.objects.get(name='AskPepper')
-    # orders = MainappOrder.objects.filter(channel = channel).delete()
-    # print(orders)
+    channel = MainappChannel.objects.get(name='Careem')
+    orders = MainappOrder.objects.filter(channel = channel).delete()
+    print(orders)
 
     # sched.add_job(start_talabat,args=[start_date,end_date,start_timer])
     # sched.add_job(start_talabat, 'interval',[start_date,end_date,start_timer], hours=3)

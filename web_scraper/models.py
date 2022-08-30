@@ -167,6 +167,7 @@ class MainappBrandBranch(models.Model):
     id = models.BigAutoField(primary_key=True)
     active = models.BooleanField()
     careem_id = models.IntegerField()
+    careem_name = models.CharField(max_length=100, blank=True, null=True)
     careem_name_status_tab = models.CharField(max_length=100, blank=True, null=True)
     csmena_name = models.CharField(max_length=50)
     askpaper_name = models.CharField(max_length=50)

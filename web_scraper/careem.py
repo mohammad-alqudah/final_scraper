@@ -7,6 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from .models import *
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
+
 import dateutil.parser
 import csv
 import smtplib
@@ -153,12 +154,9 @@ def get_order_details(start_date,end_date):
     wait.until(EC.element_to_be_clickable((By.ID,"date_range")))
     time.sleep(5)
 
-
     inputs = driver.find_elements(By.CLASS_NAME,"ant-picker-input")
     inputs[0].find_element(By.TAG_NAME,"input").send_keys(str(start_date))
     inputs[1].find_element(By.TAG_NAME,"input").send_keys(str(end_date))
-
-    from selenium.webdriver.common.action_chains import ActionChains
 
     anyway = driver.find_element(By.CLASS_NAME,"ant-badge")
     ActionChains(driver).move_to_element(anyway).click().perform()
@@ -167,33 +165,47 @@ def get_order_details(start_date,end_date):
     element = driver.find_element(By.CLASS_NAME,"ContentContainer_content__1yGKP")  
     while 1:
         time.sleep(7)
-        
+        wait.until(EC.presence_of_element_located((By.CLASS_NAME, "Button_smallButton__GJDGm")))
+
         order_list = driver.find_elements(By.CLASS_NAME, "ant-table-row-level-0")
         for order in order_list:
                 order_id = order.find_element(By.CLASS_NAME, "ant-table-cell").text 
                 order_id = order_id.replace("ID:", "")
                 order_, created  = get_or_create_order(order_id)
-
                 if len(MainappOrderItem.objects.filter(order=order_)) == 0:
-                    
-                    
+                          
                     order.click()
                     save_order_data(driver,order_id)
                     driver.find_element(By.CLASS_NAME, "Button_mediumWideButton__3LOil").click()
                     driver.execute_script("arguments[0].scrollBy(0, 70)", element)
         next_page = driver.find_elements(By.CLASS_NAME, "Button_smallButton__GJDGm")[1]
+
         if  "Button_disabled__1f6YP" in next_page.get_attribute("class"): 
             break
         next_page.click()
 
 def save_order_data(driver,order_id):
     order , created = MainappOrder.objects.get_or_create(channel=channel,order_id=order_id)
-    promo_code  = soup = BeautifulSoup(driver.find_element(By.CLASS_NAME,"ant-modal-body").get_attribute("innerHTML"), "lxml")
-    try:
-        promo_code = promo_code.find(class_= "OrderSummary_promoCode__3J0Ey").text.split("JOD")[1]
-        order.promo_code = promo_code
-        order.save()
+    date_time = driver.find_element(By.CLASS_NAME,"OrderDetails_orderTime__3xWlc").text[1:-1]
+    order.date_time=dateutil.parser.parse(date_time)
+
+    brnach = driver.find_element(By.CLASS_NAME,"OrderDetails_merchantInfo__3UZdr").text[8:]
+    try:order.brand_branch = MainappBrandBranch.objects.get(careem_name=brnach)
+    except:print (channel.name,"can't find careem name :",brnach)
+
+    order_info  =  BeautifulSoup(driver.find_element(By.CLASS_NAME,"ant-modal-body").get_attribute("innerHTML"), "lxml")
+    try:order.promo_code = order_info.find(class_= "OrderSummary_promoCode__3J0Ey").text.split("JOD")[1]
     except:pass
+
+    order.status = driver.find_element(By.CLASS_NAME,"OrderTags_orderStatus__1MhMM").text.capitalize()
+
+    order.promo_code = order_info.find(class_= "Price_price__295Er").text.split("JOD")[1]
+
+    order.type = "Delivery"
+    
+    order.save()
+
+
     items = driver.find_element(By.CLASS_NAME, "OrderItems_orderDetailsTable__2oSEV")
     html =items.get_attribute("innerHTML")
     soup = BeautifulSoup(html, "lxml")
@@ -214,7 +226,6 @@ def save_order_data(driver,order_id):
             name = (item.text).split("- ")[1].split(" x ")[0]
             price = (item.text).split(" JOD ")[1]
             quantity = (item.text).split(" x ")[1].split("+ JOD")[0]
-
             add_ons , _ = MainappAddOns.objects.get_or_create(name=name)
             order_item_add_ons , _ = MainappOrderItemAddOns.objects.get_or_create(quantity=quantity,price=price,order_item=order_item, add_ons=add_ons)
 
@@ -227,12 +238,9 @@ def save_data(row):
     order.status=status
     order.date_time=dateutil.parser.parse(row[26].replace("+03:00",""))
     order.total= row[12]
-    order.delivery_zone=row[4]
     order.delivary_fee= row[14]
     order.pg_fees = row[8].replace("%","")
     order.gross_basket = row[12]
-    print(row[12])
-    print ("_____________________")
     # print (order,_)
     
     try:order.brand_branch = MainappBrandBranch.objects.get(careem_id=row[1])
@@ -245,9 +253,9 @@ def start(start_date,end_date,start_timer):
         while 1:
             # request_data(start_date,end_date)
             # time.sleep(60)
-            link = get_link_from_email()
-            download_file(link)
-            read_csv_file()
+            # link = get_link_from_email()
+            # download_file(link)
+            # read_csv_file()
             get_order_details(start_date,end_date)
             end = datetime.now()
             timer = end - start_timer
@@ -262,10 +270,6 @@ def start(start_date,end_date,start_timer):
     #     start(start_date, end_date, start_timer)
 
 
-
-
-
-       
 def start_careem(start_date,end_date,start_timer):
     start_timer = datetime.now()
     start(start_date,end_date,start_timer)
