@@ -17,7 +17,7 @@ def run():
     from .models import  MainappOrder,MainappChannel
 
 
-    start_date  = date - timedelta(days=10)
+    start_date  = date - timedelta(days=1)
     end_date = date - timedelta(days=0)
     start_timer = datetime.now()
     # channel = MainappChannel.objects.get(name='AskPepper')
@@ -27,14 +27,14 @@ def run():
     # sched.add_job(start_talabat,args=[start_date,end_date,start_timer])
     # sched.add_job(start_talabat, 'interval',[start_date,end_date,start_timer], hours=3)
 
-    # sched.add_job(start_careem,args=[start_date,end_date,start_timer])
-    # sched.add_job(start_careem, 'interval',[start_date,end_date,start_timer], hours=3)
+    sched.add_job(start_careem,args=[start_date,end_date,start_timer])
+    sched.add_job(start_careem, 'interval',[start_date,end_date,start_timer], hours=3)
 
     # start_date  = date - timedelta(days=10)
     # end_date = date - timedelta(days=0)
 
-    sched.add_job(start_csmena,args=[start_date,end_date,start_timer])
-    sched.add_job(start_csmena, 'interval',[start_date,end_date,start_timer], hours=3)
+    # sched.add_job(start_csmena,args=[start_date,end_date,start_timer])
+    # sched.add_job(start_csmena, 'interval',[start_date,end_date,start_timer], hours=3)
 
     # sched.add_job(start_ask_pepper,args=[start_date,end_date,start_timer])
     # sched.add_job(start_ask_pepper, 'interval',[start_date,end_date,start_timer], hours=3)

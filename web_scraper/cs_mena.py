@@ -38,9 +38,8 @@ def read_orders(driver,brand_branch,count):
         if not MainappOrder.objects.filter(order_id=order_id).exists():            
             order.click()
             wait.until(EC.presence_of_element_located((By.CLASS_NAME,"order-details-box")))
-            # try:
-            order_details = driver.find_elements(By.CLASS_NAME, "order-details-box")[1].text
-            # except: print (channel.name,"ordeer don't have details")
+            try:order_details = driver.find_elements(By.CLASS_NAME, "order-details-box")[1].text
+            except: print (channel.name,"ordeer don't have details")
 
             status = order.find_element(By.CLASS_NAME, "label-info").text
             if status == "Finished":
@@ -131,6 +130,8 @@ def login():
 
 def search(start_date,end_date):
     driver.get("https://restaurant.csmena.com/#/branch/history")
+
+    
     wait.until(EC.presence_of_element_located((By.CLASS_NAME, "ng-invalid")))
     inputs = driver.find_elements(By.CLASS_NAME, "ng-invalid")
     inputs[1].send_keys(start_date.strftime('%m/%d/%Y'))
@@ -139,11 +140,14 @@ def search(start_date,end_date):
     driver.find_element(By.CLASS_NAME,"mat-form-field-infix").click()
     time.sleep(10)
     wait.until(EC.presence_of_element_located((By.TAG_NAME,"mat-option")))
+
     for count , elemant in enumerate(driver.find_elements(By.TAG_NAME,"mat-option")):
         if count>0:
             elemant.click()
             time.sleep(5)
- 
+        # if count ==0: 
+        #     print("aaaaa")
+        #     pass   
         brand_branch = (elemant.text)
         anyway = driver.find_element(By.CLASS_NAME,"btn-primary")
         ActionChains(driver).move_to_element(anyway).click().perform()
@@ -157,6 +161,7 @@ def search(start_date,end_date):
             driver.execute_script("scrollBy(0,-1000);")
 
         time.sleep(15)
+        print(len(driver.find_elements(By.TAG_NAME,"mat-option")))
 
         driver.find_element(By.CLASS_NAME,"mat-form-field-infix").click()
 

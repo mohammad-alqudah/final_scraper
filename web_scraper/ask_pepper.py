@@ -80,7 +80,6 @@ def get_order_details(status,total,deliveryZone,paymentMethod,order,type):
         items =  driver.find_elements(By.XPATH, "//div[@style='place-content: space-around flex-end; align-items: stretch; flex-direction: column; box-sizing: border-box; display: flex;']")
        
         for item in items:
-            # try:
             item_details = item.find_element(By.TAG_NAME,"div").text.split("\n")
             quantity = item_details[0].split(" ", 1)[0].replace("x", "")
             name = item_details[0].split(" ", 1)[1]
@@ -89,8 +88,6 @@ def get_order_details(status,total,deliveryZone,paymentMethod,order,type):
 
             order_item = MainappOrderItem.objects.create(item = item_ , order=order, quantity=quantity, price=price )
 
-            # except:
-            #     print(channel.name,"erorr in item ")
             item_add_ons= (item.find_elements(By.CLASS_NAME,"ng-star-inserted"))
 
             for add_ons in item_add_ons:
@@ -162,8 +159,8 @@ def search(start_date,end_date):
                     driver.find_element(By.CLASS_NAME, "mat-secondary").click()   
 
                     time.sleep(3)
-        # if count > 2  or len(orders)< 9 :
-        #     break
+        if count > 2  or len(orders)< 9 :
+            break
         element= driver.find_element(By.CLASS_NAME,"mat-sidenav-content")
         driver.execute_script("arguments[0].scrollBy(0, 10000)", element)
         driver.find_elements(By.CLASS_NAME,"mat-paginator-icon")[-1].click()
@@ -184,7 +181,7 @@ def get_brands_data(start_date,end_date):
         driver.find_element(By.XPATH, "//*[@class='mat-focus-indicator mat-menu-trigger mat-button mat-button-base']" ).click()
 
 def start(start_date,end_date,start_timer):
-    # try:
+    try:
         email ,password = get_username_and_password()
         login(email, password)
         while 1:
@@ -196,10 +193,10 @@ def start(start_date,end_date,start_timer):
                 driver.quit()
                 print(timer.seconds)
                 break
-    # except Exception as e:
-    #     print(channel.name,e)   
-    #     driver.quit()
-    #     start(start_date, end_date, start_timer)
+    except Exception as e:
+        print(channel.name,e)   
+        driver.quit()
+        start(start_date, end_date, start_timer)
 
 
 

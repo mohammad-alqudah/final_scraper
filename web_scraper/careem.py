@@ -186,11 +186,6 @@ def get_order_details(start_date,end_date):
             break
         next_page.click()
 
-
-
-
-   
-   
 def save_order_data(driver,order_id):
     order , created = MainappOrder.objects.get_or_create(channel=channel,order_id=order_id)
     promo_code  = soup = BeautifulSoup(driver.find_element(By.CLASS_NAME,"ant-modal-body").get_attribute("innerHTML"), "lxml")
@@ -203,8 +198,6 @@ def save_order_data(driver,order_id):
     html =items.get_attribute("innerHTML")
     soup = BeautifulSoup(html, "lxml")
 
-   
-   
     items = soup.find_all("tr")
     for item in items:
         is_item = "OrderItems_tableHeader__ApUjD" in item["class"]
@@ -212,9 +205,7 @@ def save_order_data(driver,order_id):
             name = item.find("div", class_= "OrderItems_itemDetailsContent__1ufsO").find("div").text
             quantity= (item.text).split("x")[0]
             price =  (item.text).split("JOD ")[1]
-     
 
-            
             item_ , _ = MainappItem.objects.get_or_create(name=name)
             order_item , _ = MainappOrderItem.objects.get_or_create(item = item_ , order=order, quantity=quantity, price=price )
 
@@ -238,6 +229,10 @@ def save_data(row):
     order.total= row[12]
     order.delivery_zone=row[4]
     order.delivary_fee= row[14]
+    order.pg_fees = row[8].replace("%","")
+    order.gross_basket = row[12]
+    print(row[12])
+    print ("_____________________")
     # print (order,_)
     
     try:order.brand_branch = MainappBrandBranch.objects.get(careem_id=row[1])
@@ -245,11 +240,11 @@ def save_data(row):
     order.save()
 
 def start(start_date,end_date,start_timer):
-    try:
+    # try:
         login()   
         while 1:
-            request_data(start_date,end_date)
-            time.sleep(60)
+            # request_data(start_date,end_date)
+            # time.sleep(60)
             link = get_link_from_email()
             download_file(link)
             read_csv_file()
@@ -261,10 +256,10 @@ def start(start_date,end_date,start_timer):
                 driver.quit()
                 print(timer.seconds)
                 break
-    except Exception as e:
-        print(channel.name,e)   
-        driver.quit()
-        start(start_date, end_date, start_timer)
+    # except Exception as e:
+    #     print(channel.name,e)   
+    #     driver.quit()
+    #     start(start_date, end_date, start_timer)
 
 
 
