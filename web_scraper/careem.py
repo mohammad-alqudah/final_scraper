@@ -199,7 +199,7 @@ def save_order_data(driver,order_id):
 
     order.status = driver.find_element(By.CLASS_NAME,"OrderTags_orderStatus__1MhMM").text.capitalize()
 
-    order.promo_code = order_info.find(class_= "Price_price__295Er").text.split("JOD")[1]
+    order.total = order_info.find(class_= "Price_price__295Er").text.split("JOD")[1]
 
     order.type = "Delivery"
     
@@ -251,11 +251,11 @@ def start(start_date,end_date,start_timer):
     # try:
         login()   
         while 1:
-            # request_data(start_date,end_date)
-            # time.sleep(60)
-            # link = get_link_from_email()
-            # download_file(link)
-            # read_csv_file()
+            request_data(start_date,end_date)
+            time.sleep(60)
+            link = get_link_from_email()
+            download_file(link)
+            read_csv_file()
             get_order_details(start_date,end_date)
             end = datetime.now()
             timer = end - start_timer

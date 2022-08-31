@@ -64,7 +64,7 @@ def get_order_details(status,total,deliveryZone,paymentMethod,order,type):
         type_index = list_data.index("Type")
         order.type = list_data[type_index+1]
         order.total = total
-        order.type = type
+        order.type = type.lower().capitalize()
         info = driver.find_elements(By.XPATH,"//*[@class='delivery ng-star-inserted']")
         for i in info : 
             info_data = i.text.split("\n")
