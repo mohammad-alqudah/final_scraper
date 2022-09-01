@@ -66,6 +66,7 @@ def save_data(row):
     order.delivery_zone=row[14]
     order.delivary_fee= row[23]
     order.payment_method=row[18]
+    order.type = "Delivery"
     try:order.brand_branch = MainappBrandBranch.objects.get(talabat_id=row[3])
     except:print (channel.name,"can't find brand_branch name :",row[3] )
     order.save()

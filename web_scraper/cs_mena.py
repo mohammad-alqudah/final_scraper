@@ -54,7 +54,6 @@ def read_orders(driver,brand_branch,count):
         Customer_Phone_index = order_list.index("Phone")
         customer_mobile_number =  "+962" + order_list[Customer_Phone_index+1][1:]
         try:
-            print (customer_mobile_number)
             order = MainappOrder.objects.get(channel=channel,date_time__hour=hour,date_time__minute=minute,date_time__second=second,customer_mobile_number=customer_mobile_number)
             if len(MainappOrderItem.objects.filter(order=order)) == 0:
 
@@ -219,7 +218,7 @@ def read_csv():
         
             if(os.path.exists(file_name) and os.path.isfile(file_name)):
                 # os.remove(file_name)
-                print("file deleted")
+                print(file_name,"file deleted")
             else:print("file not found")
             break
 
