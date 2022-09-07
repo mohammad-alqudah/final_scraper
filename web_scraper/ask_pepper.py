@@ -171,14 +171,15 @@ def get_brands_data(start_date,end_date):
     wait.until(EC.presence_of_element_located(( By.CLASS_NAME,"mat-menu-item")))
     brands = driver.find_elements(By.CLASS_NAME,"mat-menu-item")
     for index, brand in enumerate (brands):
+        if index >0:
+            wait.until(EC.presence_of_element_located((By.XPATH, "//*[@class='mat-focus-indicator mat-menu-trigger mat-button mat-button-base']" )))
+            driver.find_element(By.XPATH, "//*[@class='mat-focus-indicator mat-menu-trigger mat-button mat-button-base']" ).click()
         
         time.sleep(2)
         list_of_brands = driver.find_element(By.CLASS_NAME,"mat-menu-content")
         list_of_brands.find_elements(By.TAG_NAME,"button")[index].click()
         search(start_date,end_date)
-        wait.until(EC.presence_of_element_located((By.XPATH, "//*[@class='mat-focus-indicator mat-menu-trigger mat-button mat-button-base']" )))
 
-        driver.find_element(By.XPATH, "//*[@class='mat-focus-indicator mat-menu-trigger mat-button mat-button-base']" ).click()
 
 def start(start_date,end_date,start_timer):
     try:

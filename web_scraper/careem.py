@@ -124,10 +124,10 @@ def download_file(link):
     driver.quit()
 
 def read_csv_file():    
-    list_of_files = os.listdir(r'C:\Users\mohm1\Downloads') #list of files in the current directory
+    list_of_files = os.listdir(settings.DOWNLOAD_PATH) #list of files in the current directory
     for each_file in list_of_files:
         if each_file.startswith('soa'):  #since its all type str you can simply use startswith
-            file_name ="C:\\Users\\mohm1\\Downloads\\"+ each_file
+            file_name =os.path.join(str(settings.DOWNLOAD_PATH), each_file)
             file = open(file_name)
             csvreader = csv.reader(file)
             header = []
@@ -239,8 +239,10 @@ def save_data(row):
     order.date_time=dateutil.parser.parse(row[26].replace("+03:00",""))
     order.total= row[12]
     order.delivary_fee= row[14]
-    order.pg_fees = row[8].replace("%","")
-    order.gross_basket = row[12]
+    pg_fees = row[8].replace("%","")
+    gross_basket = row[12]
+   
+    order.online_payment_fees= float(pg_fees) * float(gross_basket)
     # print (order,_)
     
     try:order.brand_branch = MainappBrandBranch.objects.get(careem_id=row[1])
@@ -248,7 +250,7 @@ def save_data(row):
     order.save()
 
 def start(start_date,end_date,start_timer):
-    # try:
+    try:
         login()   
         while 1:
             request_data(start_date,end_date)
@@ -264,10 +266,10 @@ def start(start_date,end_date,start_timer):
                 driver.quit()
                 print(timer.seconds)
                 break
-    # except Exception as e:
-    #     print(channel.name,e)   
-    #     driver.quit()
-    #     start(start_date, end_date, start_timer)
+    except Exception as e:
+        print(channel.name,e)   
+        driver.quit()
+        start(start_date, end_date, start_timer)
 
 
 def start_careem(start_date,end_date,start_timer):

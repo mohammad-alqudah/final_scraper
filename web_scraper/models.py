@@ -350,7 +350,7 @@ class MainappOrder(models.Model):
     order_id = models.IntegerField(blank=True, null=True)
     status = models.CharField(max_length=50, blank=True, null=True)
     date_time = models.DateTimeField(blank=True, null=True)
-    type = models.CharField(max_length=50, blank=True, null=True)
+    type = models.CharField(max_length=50, default="Delivery")
     total = models.DecimalField(max_digits=5, decimal_places=3, blank=True, null=True)
     delivery_zone = models.CharField(max_length=50, blank=True, null=True)
     details = models.CharField(max_length=500, blank=True, null=True)
@@ -361,10 +361,9 @@ class MainappOrder(models.Model):
     payment_method = models.CharField(max_length=50, blank=True, null=True)
     brand_branch = models.ForeignKey(MainappBrandBranch, models.CASCADE, blank=True, null=True)
     channel = models.ForeignKey(MainappChannel, models.CASCADE, blank=True, null=True)
-    gross_basket = models.DecimalField(max_digits=5, decimal_places=3, blank=True, null=True)
     payment_handling_charges = models.DecimalField(max_digits=5, decimal_places=3, blank=True, null=True)
-    pg_fees = models.DecimalField(max_digits=5, decimal_places=3, blank=True, null=True)
     promo_code = models.DecimalField(max_digits=5, decimal_places=3, blank=True, null=True)
+    online_payment_fees=  models.DecimalField(max_digits=8, decimal_places=4, blank=True, null=True)
      
     class Meta:
         managed = False

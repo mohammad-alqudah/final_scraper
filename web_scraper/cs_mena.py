@@ -6,6 +6,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.keys import Keys
+
 from .models import MainappOrder, MainappChannel, MainappBrandBranch ,MainappOrderItem, MainappItem,MainappAddOns,MainappOrderItemAddOns
 import dateutil.parser
 from datetime import datetime, timedelta
@@ -28,16 +29,7 @@ def read_orders(driver,brand_branch,count):
         minute = creation_time.minute
         second = creation_time.second
 
-        # order.find_element(By.TAG_NAME,"i").click()
-
-        # wait.until(EC.presence_of_element_located((By.CLASS_NAME,"mat-card-subtitle")))
-        # time.sleep(1)
-        # dateTime = driver.find_element(By.CLASS_NAME,"mat-card-subtitle").text
-        # time.sleep(5)
-        # driver.find_element(By.CLASS_NAME,"w-100").click()
-        # time.sleep(1)
-        # dateWithTime = datetime.strptime(dateTime, '%b %d, %Y, %H:%M:%S %p')
-        # date= datetime.strftime(dateWithTime, '%y%m%d')
+       
 
         # if not MainappOrder.objects.filter(date_time__hour=hour,date_time__minute=minute,date_time_second=second).exists():   # change to len order item          
         order.click()
@@ -54,7 +46,9 @@ def read_orders(driver,brand_branch,count):
         Customer_Phone_index = order_list.index("Phone")
         customer_mobile_number =  "+962" + order_list[Customer_Phone_index+1][1:]
         try:
-            order = MainappOrder.objects.get(channel=channel,date_time__hour=hour,date_time__minute=minute,date_time__second=second,customer_mobile_number=customer_mobile_number)
+        # if 1==1:
+            # print(channel,hour,minute,second,customer_mobile_number)
+            order  = MainappOrder.objects.get(channel=channel,date_time__hour=hour,date_time__minute=minute,date_time__second=second,customer_mobile_number=customer_mobile_number)
             if len(MainappOrderItem.objects.filter(order=order)) == 0:
 
                 order.status = status
@@ -115,7 +109,7 @@ def login():
     driver.maximize_window()
     driver.get("https://restaurant.csmena.com/#/auth/login")
     global wait
-    wait = WebDriverWait(driver, 80)
+    wait = WebDriverWait(driver, 30)
     global channel
     channel,_ = MainappChannel.objects.get_or_create(name='Csmena')
 
@@ -143,12 +137,11 @@ def search(start_date,end_date):
 
     driver.find_element(By.CLASS_NAME,"mat-form-field-infix").click()
     wait.until(EC.presence_of_element_located((By.TAG_NAME,"mat-option")))
-
+    time.sleep(2)
     for count , elemant in enumerate(driver.find_elements(By.TAG_NAME,"mat-option")):
         if count>0:
             elemant.click()
             time.sleep(2)
-
         brand_branch = (elemant.text)
         anyway = driver.find_element(By.CLASS_NAME,"btn-primary")
         ActionChains(driver).move_to_element(anyway).click().perform()
@@ -157,9 +150,11 @@ def search(start_date,end_date):
 
         try:wait.until(EC.presence_of_element_located((By.XPATH, "//*[@class='fa fa-history f-16']")))
         except:pass
+
         brand_branch = MainappBrandBranch.objects.get(csmena_name=brand_branch)
+
         read_orders(driver,brand_branch,count)
-        for i in range (50):
+        for i in range (3):
             time.sleep(1)
             driver.execute_script("scrollBy(0,-1000);")
 
@@ -177,18 +172,13 @@ def download_report(start_date,end_date):
     inputs[2].send_keys(end_date.strftime('%m/%d/%Y'))
     
     driver.find_element(By.CLASS_NAME,"btn-primary").click()
-
-    time.sleep(3)
-
+    print("here")
+    time.sleep(6)
     try:
         driver.find_element(By.CLASS_NAME,"buttons-excel").click()
-    except:pass
-
+    except:print("csmena can't download report file")
 
 def save_data(orderID, creationTime,customerPhoneNumber,pickUpType,branchName,totalAmount,deliveryCharge,orderStatus,isDeclined):
-    # if row[5]== "delivered":
-    #     status = "Delivered"
-    # else: status = "Cancelled"
 
     order , _ = MainappOrder.objects.get_or_create(channel=channel,order_id=orderID)
     if isDeclined == False:
@@ -206,10 +196,10 @@ def save_data(orderID, creationTime,customerPhoneNumber,pickUpType,branchName,to
     order.save()
 
 def read_csv():
-    list_of_files = os.listdir(r'C:\Users\mohm1\Downloads') #list of files in the current directory
+    list_of_files = os.listdir(settings.DOWNLOAD_PATH) #list of files in the current directory
     for each_file in list_of_files:
         if each_file.startswith('Report_created_on'): 
-            file_name ="C:\\Users\\mohm1\\Downloads\\"+ each_file
+            file_name =os.path.join(str(settings.DOWNLOAD_PATH), each_file)
 
             df = pd.read_excel(file_name)
             for index, row in df.iterrows():
@@ -217,17 +207,17 @@ def read_csv():
                 save_data(row['orderID'], row['creationTime'],row["customerPhoneNumber"],row["pickUpType"],row["branchName"],row["totalAmount"],row["deliveryCharge"],row["orderStatus"],row["isDeclined"])
         
             if(os.path.exists(file_name) and os.path.isfile(file_name)):
-                # os.remove(file_name)
+                os.remove(file_name)
                 print(file_name,"file deleted")
             else:print("file not found")
             break
 
 def start(start_date,end_date,start_timer):
-    # try:
+    try:
         login()
         while 1:
-            # download_report(start_date,end_date)
-            # read_csv()
+            download_report(start_date,end_date)
+            read_csv()
             search(start_date,end_date)
 
             time.sleep(60*15)
@@ -237,10 +227,10 @@ def start(start_date,end_date,start_timer):
                 driver.quit()
                 print(timer.seconds)
                 break
-    # except Exception as e:
-    #         print(channel.name,e)   
-    #         driver.quit()
-    #         start(start_date,end_date,start_timer)
+    except Exception as e:
+            print(channel.name,e)   
+            driver.quit()
+            start(start_date,end_date,start_timer)
     
 def start_csmena(start_date,end_date,start_timer):
     start_timer = datetime.now()

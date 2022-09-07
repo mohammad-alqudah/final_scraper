@@ -6,6 +6,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 import csv
 import os
+
+from scraper.settings import DOWNLOAD_PATH
 from .models import MainappBrand, MainappOrder, MainappChannel, MainappBrandBranch ,MainappOrderItem, MainappStatus, MainappItem, MainappAddOns,MainappOrderItemAddOns
 import dateutil.parser
 from datetime import datetime, timedelta
@@ -72,7 +74,7 @@ def save_data(row):
     order.save()
 
 def read_csv_file():
-    file = open(r'C:\Users\mohm1\Downloads\orderDetails.csv')# shold be server bath
+    file = open(os.path.join(str(settings.DOWNLOAD_PATH), "orderDetails.csv"))
     csvreader = csv.reader(file)
     header = []
     header = next(csvreader)
@@ -81,7 +83,7 @@ def read_csv_file():
             rows.append(row)
             save_data(row)
     file.close()
-    file = r"C:\Users\mohm1\Downloads\orderDetails.csv"
+    file = os.path.join(str(settings.DOWNLOAD_PATH), "orderDetails.csv")
     if(os.path.exists(file) and os.path.isfile(file)):
         os.remove(file)
         print("file deleted")
@@ -159,6 +161,7 @@ def start(start_date,end_date,start_timer):
 
     try:
         login(start_date,end_date)  
+
         time.sleep(10) 
         while 1:
             ignore_tabs()

@@ -89,7 +89,8 @@ def get_order_details(order_link,order_id):
     order.customer_name = order_info[3]
     order.total = order_info[7].replace(" JOD", "")
     order.type = order_info[9]
-    order.status = order_info[11]
+    print(order_info[12])
+    order.status = order_info[12]
     wait.until(EC.presence_of_element_located((By.CLASS_NAME, "mb-1")))
     time.sleep(1)
     order.customer_mobile_number = driver.find_elements(By.CLASS_NAME, "mb-1")[1].text
