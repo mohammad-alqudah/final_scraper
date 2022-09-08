@@ -78,11 +78,11 @@ WSGI_APPLICATION = 'scraper.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'defaultdb',
+        'NAME': 'scrapper',
         'USER': 'doadmin',
         'PASSWORD': 'AVNS_ZxLhsYiGmQrob6QUQd1',
         'HOST': 'db-postgresql-fra1-67394-do-user-12204816-0.b.db.ondigitalocean.com',
-        'PORT': '25060',
+        'PORT': '25061',
     }
 }
 
