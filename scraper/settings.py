@@ -83,6 +83,7 @@ DATABASES = {
         'PASSWORD': 'AVNS_ZxLhsYiGmQrob6QUQd1',
         'HOST': 'db-postgresql-fra1-67394-do-user-12204816-0.b.db.ondigitalocean.com',
         'PORT': '25061',
+        'CONN_MAX_AGE':10,
     }
 }
 
