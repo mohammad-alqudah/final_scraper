@@ -133,4 +133,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 DRIVER_PATH = BASE_DIR.joinpath("chromedriver.exe")
+# DOWNLOAD_PATH = "C:\\Users\\mohm1\\Downloads"
 DOWNLOAD_PATH = "C:\\Users\\mohm1\\Downloads"
+

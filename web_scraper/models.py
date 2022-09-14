@@ -189,6 +189,8 @@ class MainappChannel(models.Model):
     monthly_fees = models.DecimalField(max_digits=5, decimal_places=3, blank=True, null=True)
     start_date = models.DateField(blank=True, null=True)
     image = models.CharField(max_length=100, blank=True, null=True)
+    last_update = models.DateTimeField(null=True,blank=True)
+
 
     class Meta:
         managed = False
@@ -352,7 +354,7 @@ class MainappOrder(models.Model):
     date_time = models.DateTimeField(blank=True, null=True)
     type = models.CharField(max_length=50, default="Delivery")
     total = models.DecimalField(max_digits=5, decimal_places=3, blank=True, null=True)
-    delivery_zone = models.CharField(max_length=50, blank=True, null=True)
+    delivery_zone = models.CharField(max_length=100, blank=True, null=True)
     details = models.CharField(max_length=500, blank=True, null=True)
     customer_name = models.CharField(max_length=50, blank=True, null=True)
     customer_mobile_number = models.CharField(max_length=50, blank=True, null=True)

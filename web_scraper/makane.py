@@ -36,37 +36,29 @@ def login():
     driver.find_element(By.ID, "password").send_keys(password)
     driver.find_element(By.CLASS_NAME,"btn-primary").click()
 
-    time.sleep(5)
+    time.sleep(6)
 
     driver.get("https://dashboard.makane.com/admin/resources/orders?orders_filter=W3siY2xhc3MiOiJBcHBcXE5vdmFcXEZpbHRlcnNcXE9yZGVyc0NhbGxDZW50ZXIiLCJ2YWx1ZSI6MjI2OTV9XQ%3D%3D")
 
 def get_items(order):
+
     wait.until(EC.presence_of_element_located((By.XPATH, "//*[@class='flex border-b border-dotted border-60 py-2']")))
-    items = driver.find_elements(By.XPATH, "//*[@class='flex border-b border-dotted border-60 py-2']")
-    print("________________")
-
-    for item in items:
-
-        # price = item.find_element(By.XPATH, "//*[@class='flex-no-shrink pt-2']").text.replace(" JOD","")
-        # name = item.find_element(By.XPATH, "//*[@class='text-xl font-bold']").text
-        # quantity = item.find_element(By.XPATH, "//*[@class='font-bold']").text.replace("x", "")
-
-
+    list_of_items = driver.find_element(By.CLASS_NAME , "text-lg")
+    iteems = list_of_items.find_elements(By.CLASS_NAME, "border-dotted")
+    for item in iteems[:-1]:        
         data = item.text.split("\n")
         price = data[-1].replace(" JOD","")
         name = data[0].split("x ")[1]
         quantity = data[0].split("x ")[0]
 
         item_ , _ = MainappItem.objects.get_or_create(name=name)
-        order_item  = MainappOrderItem.objects.create(item = item_ , order=order, quantity=quantity,price=price)
-        
-        add_ons =  item.find_elements(By.XPATH, "//*[@class='font-bold ml-6 text-80 pt-2']")
-        for add_on in add_ons[1:]:
-            add_on_list =  (add_on.text.split("\n"))
-            if add_on_list[0].startswith("Add On"):
-                name = add_on_list[0].replace("Add On : ","")
-                price = add_on_list[1].replace("(","").replace(") JOD","")
-                add_ons , _ = MainappAddOns.objects.get_or_create(name=name)
+        order_item = MainappOrderItem.objects.create(item = item_ , order=order, quantity=quantity,price=price)
+        if data[2].startswith("Add On"):
+
+            name = data[2].replace("Add On","").replace(":","").strip()
+            price = data[3].replace("(","").replace(") JOD","")
+            add_ons , _ = MainappAddOns.objects.get_or_create(name=name)
+            if name != "":
                 order_item_add_ons , _ = MainappOrderItemAddOns.objects.get_or_create(quantity=0,price=price,order_item=order_item, add_ons=add_ons)
                
 
@@ -74,27 +66,31 @@ def get_order_details(order_link,order_id):
     driver.execute_script('window.open("{}")'.format(order_link))
     driver.switch_to.window(driver.window_handles[1])
     wait.until(EC.presence_of_element_located((By.XPATH,"//*[@class='card mb-6 py-3 px-6']")))
-    order_info =driver.find_element(By.XPATH,"//*[@class='card mb-6 py-3 px-6']").text.split("\n")
-
-    order , _ = MainappOrder.objects.get_or_create(channel=channel,order_id=order_id)
-
+    time.sleep(5)
     try:
-        order.brand_branch = MainappBrandBranch.objects.filter(makane_name=order_info[5]).first()
-    except:
-        print (channel.name,order_info)
-        print ("can't find brand_branch name :",order_info[5])
+        driver.find_element(By.XPATH,"//*[text()='OK']").click()
+    except:pass
+
+    order_info =driver.find_element(By.XPATH,"//*[@class='card mb-6 py-3 px-6']").text.split("\n")
+    order , _ = MainappOrder.objects.get_or_create(channel=channel,order_id=order_id)
 
     date_time = datetime.strptime(order_info[1], '%Y-%m-%d %I:%M:%S %p')
     order.date_time = date_time
     order.customer_name = order_info[3]
     order.total = order_info[7].replace(" JOD", "")
     order.type = order_info[9]
-    print(order_info[12])
-    order.status = order_info[12]
+    status = order_info[12]
+    if status == "Canceled":
+        order.status = "Cancelled"
+    elif status =="Cancelled":
+        order.status ="Cancelled"
+    else:
+        order.status = "Delivered"
     wait.until(EC.presence_of_element_located((By.CLASS_NAME, "mb-1")))
     time.sleep(1)
     order.customer_mobile_number = driver.find_elements(By.CLASS_NAME, "mb-1")[1].text
     order.delivary_fee = driver.find_elements(By.CLASS_NAME, "text-right")[-1].text.replace(" JOD", "")
+    order.delivery_zone = driver.find_elements(By.CLASS_NAME, "mb-1")[2].text 
     order.save()
     get_items(order)
     driver.close()
@@ -125,6 +121,7 @@ def get_orders():
                 order.brand_branch = MainappBrandBranch.objects.filter(makane_name=brands_list[i]).first()
                 order.save()
             except:
+                
                 print (channel.name,"can't find brand_branch name :",brands_list[i])
             
             if len(MainappOrderItem.objects.filter(order=order)) == 0:
@@ -133,8 +130,8 @@ def get_orders():
                 driver.window_handles[0]
                 
                 get_order_details(link_list[i],id_list[i])
-        if count > 10:
-            break
+        # if count > 10:
+        #     break
         driver.window_handles[0]
         driver.switch_to.window(driver.window_handles[0])
 
@@ -146,7 +143,7 @@ def get_orders():
 
 def start(start_date, end_date, start_timer):
 
-    try:
+    # try:
         login()
 
         while 1:
@@ -160,10 +157,10 @@ def start(start_date, end_date, start_timer):
                 driver.quit()
                 print(timer.seconds)
                 break
-    except Exception as e:
-        print(channel.name,e)   
-        driver.quit()
-        start(start_date, end_date, start_timer)
+    # except Exception as e:
+    #     print(channel.name,e)   
+    #     driver.quit()
+    #     start(start_date, end_date, start_timer)
 
 
 def start_makane(start_date,end_date,start_timer):
