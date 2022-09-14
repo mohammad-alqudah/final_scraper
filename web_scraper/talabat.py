@@ -6,6 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 import csv
 import os
+from .utils import *
 
 from scraper.settings import DOWNLOAD_PATH
 from .models import MainappBrand, MainappOrder, MainappChannel, MainappBrandBranch ,MainappOrderItem, MainappStatus, MainappItem, MainappAddOns,MainappOrderItemAddOns
@@ -159,9 +160,7 @@ def get_Status():
             update_status(cell_data)
 
 
-def last_update():
-    channel.last_update =datetime().now()
-    channel.save()
+
      
 def start(start_date,end_date,start_timer):
 
@@ -174,7 +173,7 @@ def start(start_date,end_date,start_timer):
             # get_orders() 
             # get_orders_details()
             # get_Status()
-            last_update()
+            last_update(channel)
             time.sleep(60*15)
             end = datetime.now()
             timer = end - start_timer

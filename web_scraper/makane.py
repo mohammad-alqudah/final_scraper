@@ -11,6 +11,7 @@ from .models import MainappBrand, MainappOrder, MainappChannel, MainappBrandBran
 import dateutil.parser
 from datetime import datetime, timedelta
 from django.conf import settings 
+from .utils import *
 
 
 
@@ -143,24 +144,24 @@ def get_orders():
 
 def start(start_date, end_date, start_timer):
 
-    # try:
+    try:
         login()
 
         while 1:
 
             get_orders()
+            last_update(channel)
             end = datetime.now()
-
             timer = end - start_timer
             time.sleep(60*15)
             if timer.seconds > 3*60*60:
                 driver.quit()
                 print(timer.seconds)
                 break
-    # except Exception as e:
-    #     print(channel.name,e)   
-    #     driver.quit()
-    #     start(start_date, end_date, start_timer)
+    except Exception as e:
+        print(channel.name,e)   
+        driver.quit()
+        start(start_date, end_date, start_timer)
 
 
 def start_makane(start_date,end_date,start_timer):

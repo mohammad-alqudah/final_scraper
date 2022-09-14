@@ -6,7 +6,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.keys import Keys
-
+from .utils import *
 from .models import MainappOrder, MainappChannel, MainappBrandBranch ,MainappOrderItem, MainappItem,MainappAddOns,MainappOrderItemAddOns
 import dateutil.parser
 from datetime import datetime, timedelta
@@ -172,10 +172,13 @@ def download_report(start_date,end_date):
     inputs[2].send_keys(end_date.strftime('%m/%d/%Y'))
     
     driver.find_element(By.CLASS_NAME,"btn-primary").click()
-    print("here")
+    
     time.sleep(6)
+    driver.execute_script("scrollBy(0,1000);")
+    time.sleep(1)
     try:
         driver.find_element(By.CLASS_NAME,"buttons-excel").click()
+        last_update(channel)
     except:print("csmena can't download report file")
 
 def save_data(orderID, creationTime,customerPhoneNumber,pickUpType,branchName,totalAmount,deliveryCharge,orderStatus,isDeclined):
@@ -219,7 +222,6 @@ def start(start_date,end_date,start_timer):
             download_report(start_date,end_date)
             read_csv()
             search(start_date,end_date)
-
             time.sleep(60*15)
             end = datetime.now()
             timer = end - start_timer

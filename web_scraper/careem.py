@@ -7,6 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from .models import *
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
+from .utils import *
 
 import dateutil.parser
 import csv
@@ -259,6 +260,8 @@ def start(start_date,end_date,start_timer):
             download_file(link)
             read_csv_file()
             get_order_details(start_date,end_date)
+            last_update(channel)
+
             end = datetime.now()
             timer = end - start_timer
             time.sleep(60*15)

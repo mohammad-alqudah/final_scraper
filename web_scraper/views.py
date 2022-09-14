@@ -24,8 +24,8 @@ def run():
     # orders = MainappOrder.objects.filter(channel = channel).delete()
     # print(orders)
 
-    sched.add_job(start_talabat,args=[start_date,end_date,start_timer])
-    sched.add_job(start_talabat, 'interval',[start_date,end_date,start_timer], hours=3)
+    # sched.add_job(start_talabat,args=[start_date,end_date,start_timer])
+    # sched.add_job(start_talabat, 'interval',[start_date,end_date,start_timer], hours=3)
 
 
     # sched.add_job(start_careem,args=[start_date,end_date,start_timer])
@@ -34,8 +34,8 @@ def run():
     # start_date  = date - timedelta(days=2)
     # end_date = date - timedelta(days=0)
 
-    # sched.add_job(start_csmena,args=[start_date,end_date,start_timer])
-    # sched.add_job(start_csmena, 'interval',[start_date,end_date,start_timer], hours=3)
+    sched.add_job(start_csmena,args=[start_date,end_date,start_timer])
+    sched.add_job(start_csmena, 'interval',[start_date,end_date,start_timer], hours=3)
 
     # sched.add_job(start_ask_pepper,args=[start_date,end_date,start_timer])
     # sched.add_job(start_ask_pepper, 'interval',[start_date,end_date,start_timer], hours=3)

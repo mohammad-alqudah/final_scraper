@@ -9,6 +9,7 @@ from .models import MainappOrder, MainappChannel, MainappBrandBranch ,MainappOrd
 import dateutil.parser
 from datetime import datetime
 from django.conf import settings 
+from .utils import *
 
 
 def get_username_and_password():
@@ -187,6 +188,8 @@ def start(start_date,end_date,start_timer):
         login(email, password)
         while 1:
             get_brands_data(start_date,end_date)
+            last_update(channel)
+
             end = datetime.now()
             timer = end - start_timer
             time.sleep(60*15)
