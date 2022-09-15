@@ -222,6 +222,7 @@ def start(start_date,end_date,start_timer):
             download_report(start_date,end_date)
             read_csv()
             search(start_date,end_date)
+            db.close_old_connections()
             time.sleep(60*15)
             end = datetime.now()
             timer = end - start_timer

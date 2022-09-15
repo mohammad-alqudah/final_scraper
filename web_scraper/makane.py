@@ -151,6 +151,8 @@ def start(start_date, end_date, start_timer):
 
             get_orders()
             last_update(channel)
+            db.close_old_connections()
+
             end = datetime.now()
             timer = end - start_timer
             time.sleep(60*15)

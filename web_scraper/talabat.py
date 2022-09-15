@@ -146,6 +146,7 @@ def update_status(cell_data):
         brand_branch = MainappBrandBranch.objects.filter(talabat_name=cell_data[0]).first()  # we need to add talabat name 
         status, created = MainappStatus.objects.get_or_create(channel=channel,brand_branch=brand_branch)
         status.status = cell_data[1][:6]
+        status.datetime = datetime.now()
         status.save()
     except:print(channel.name,"can't find :",cell_data[0] )
         
@@ -164,30 +165,31 @@ def get_Status():
      
 def start(start_date,end_date,start_timer):
 
-    # try:
+    try:
         login(start_date,end_date)  
 
         time.sleep(10) 
         while 1:
-            # ignore_tabs()
-            # get_orders() 
-            # get_orders_details()
-            # get_Status()
+            ignore_tabs()
+            get_orders() 
+            get_orders_details()
+            get_Status()
             last_update(channel)
+            db.close_old_connections()
+
             time.sleep(60*15)
             end = datetime.now()
             timer = end - start_timer
-
             if timer.seconds > 3*60*60:
                 driver.quit()
                 print(timer.seconds)
                 break
 
-    # except Exception as e: 
-    #     print(channel.name,e)
-    #     driver.quit()
+    except Exception as e: 
+        print(channel.name,e)
+        driver.quit()
 
-    #     start(start_date,end_date,start_timer)
+        start(start_date,end_date,start_timer)
         
 
 

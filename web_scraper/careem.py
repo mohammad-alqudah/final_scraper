@@ -250,6 +250,28 @@ def save_data(row):
     except:print (channel.name,"can't find careem id :",row[1])
     order.save()
 
+
+def get_Status():
+    driver.switch_to.window(driver.window_handles[2])
+    time.sleep(3)
+    branches =driver.find_elements(By.TAG_NAME,"tr")[2:]
+
+    for branch in branches:
+        cells =branch.find_elements(By.TAG_NAME,"td")
+        careem_name_status_tab =(cells[0].text +" "+cells[1].text+" "+cells[2].text)
+        brand_branch = MainappBrandBranch.objects.filter(careem_name_status_tab=careem_name_status_tab).first()
+        try:
+            status, created = MainappStatus.objects.get_or_create(channel=channel,brand_branch=brand_branch)
+            if cells[3].find_element(By.TAG_NAME,"button").get_attribute("aria-checked") == "true":
+                status.status = "open"
+            else:status.status = "close"
+            status.datetime = datetime.now()
+
+            status.save()
+
+        except:print ("careem: can't find branch name in status tab :", careem_name_status_tab)
+
+
 def start(start_date,end_date,start_timer):
     try:
         login()   
@@ -260,11 +282,14 @@ def start(start_date,end_date,start_timer):
             download_file(link)
             read_csv_file()
             get_order_details(start_date,end_date)
-            last_update(channel)
+            get_Status()
 
+            last_update(channel)
+            db.close_old_connections()
             end = datetime.now()
             timer = end - start_timer
             time.sleep(60*15)
+            
             if timer.seconds > 3*60*60:
                 driver.quit()
                 print(timer.seconds)
@@ -280,71 +305,3 @@ def start_careem(start_date,end_date,start_timer):
     start(start_date,end_date,start_timer)
 
  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-def get_or_create_order(order_id):
-    channel = MainappChannel.objects.get(name='Careem')
-    order , created = MainappOrder.objects.get_or_create(channel=channel,order_id=order_id)
-    return order, created 
-def get_Status(driver):
-    channel = MainappChannel.objects.get(name='Careem')
-    driver.switch_to.window(driver.window_handles[2])
-    time.sleep(3)
-    branches =driver.find_elements(By.TAG_NAME,"tr")[2:]
-
-    for branch in branches:
-        cells =branch.find_elements(By.TAG_NAME,"td")
-        careem_name_status_tab =(cells[0].text +" "+cells[1].text+" "+cells[2].text).replace(" ", "_").lower()
-        brand_branch = MainappBrandBranch.objects.filter(careem_name_status_tab=careem_name_status_tab).first()
-        try:
-            status, created = MainappStatus.objects.get_or_create(channel=channel,brand_branch=brand_branch)
-            if cells[3].find_element(By.TAG_NAME,"button").get_attribute("aria-checked") == "true":
-                status.status = "open"
-            else:status.status = "close"
-            status.save()
-
-        except:pass

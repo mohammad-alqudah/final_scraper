@@ -171,6 +171,7 @@ class MainappBrandBranch(models.Model):
     careem_name_status_tab = models.CharField(max_length=100, blank=True, null=True)
     csmena_name = models.CharField(max_length=50)
     askpaper_name = models.CharField(max_length=50)
+    askpaper_name_status_tab = models.CharField(max_length=50,null=True,blank=True)
     multiplayer_forecast = models.DecimalField(max_digits=5, decimal_places=3)
     fp_branch = models.ForeignKey('MainappFpBranch', models.CASCADE, db_column='Fp_branch_id', blank=True, null=True)  # Field name made lowercase.
     brand = models.ForeignKey(MainappBrand, models.CASCADE)

@@ -5,12 +5,12 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.keys import Keys
-from .models import MainappOrder, MainappChannel, MainappBrandBranch ,MainappOrderItem, MainappItem,MainappAddOns,MainappOrderItemAddOns,MainappBrand
+from .models import MainappOrder, MainappChannel, MainappBrandBranch ,MainappOrderItem, MainappItem,MainappAddOns,MainappOrderItemAddOns,MainappBrand,MainappStatus
 import dateutil.parser
 from datetime import datetime
 from django.conf import settings 
 from .utils import *
-
+from django import db
 
 def get_username_and_password():
     email  = "a.shehadeh@kitchefy.com"
@@ -181,6 +181,34 @@ def get_brands_data(start_date,end_date):
         list_of_brands.find_elements(By.TAG_NAME,"button")[index].click()
         search(start_date,end_date)
 
+def get_Status():
+
+    driver.get("https://dashboard.ask-pepper.com/admin/settings/branch/operatingstatus")
+    wait.until(EC.presence_of_element_located((By.TAG_NAME,"mat-card")))
+
+    branchs = driver.find_elements(By.TAG_NAME,"mat-card")
+    for branch in branchs:
+        branch_name = branch.find_element(By.TAG_NAME,"h2").text
+        brand_branch = MainappBrandBranch.objects.filter(askpaper_name_status_tab=branch_name).first()
+        # try:
+        status, created = MainappStatus.objects.get_or_create(channel=channel,brand_branch=brand_branch)
+        if branch.find_element(By.TAG_NAME,"input").get_attribute("checked") == "true":
+            status.status = "open"
+        else:status.status = "close"
+        status.datetime = datetime.now()
+
+        status.save()
+
+        # except:print ("askpepper: can't find branch name in status tab :", branch_name)
+
+
+
+
+    
+
+
+
+
 
 def start(start_date,end_date,start_timer):
     try:
@@ -188,11 +216,14 @@ def start(start_date,end_date,start_timer):
         login(email, password)
         while 1:
             get_brands_data(start_date,end_date)
+            get_Status()
             last_update(channel)
 
+            db.close_old_connections()
             end = datetime.now()
             timer = end - start_timer
             time.sleep(60*15)
+
             if timer.seconds > 3*60*60:
                 driver.quit()
                 print(timer.seconds)
